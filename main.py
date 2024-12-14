@@ -1,6 +1,6 @@
-from data_handler import DataHandler
-from hrp_core import create_hrp_portfolio
-from visualization import plot_portfolio_analysis
+from src.data_handler import DataHandler
+from src.hrp_core import create_hrp_portfolio
+from src.visualization import plot_portfolio_analysis
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
