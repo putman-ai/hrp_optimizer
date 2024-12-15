@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from src.data_handler import DataHandler
+from src.proc.data_handler import DataHandler
 
 def test_load_market_data():
     """Test comprehensive data loading and validation from sp500_data.csv"""
@@ -73,3 +73,50 @@ def test_load_market_data_invalid_path():
     handler = DataHandler()
     with pytest.raises(Exception):
         handler.load_market_data('nonexistent_file.csv', min_market_cap=2000)
+
+def test_calculate_quality_metrics():
+    """Test quality metrics calculation and standardization"""
+    print("\nTesting calculate_quality_metrics...")
+    
+    try:
+        # Initialize handler and load test data
+        handler = DataHandler()
+        df = handler.load_market_data('data/sp500_data.csv', min_market_cap=2000)
+        
+        # Calculate quality metrics
+        quality_df = handler.calculate_quality_metrics(df)
+        
+        # 1. Verify required columns exist
+        required_columns = ['croic_z', 'margin_z', 'turnover_z', 'quality_score']
+        for col in required_columns:
+            assert col in quality_df.columns, f"Required column {col} missing"
+            
+        # 2. Validate standardization
+        z_score_columns = ['croic_z', 'margin_z', 'turnover_z']
+        for col in z_score_columns:
+            assert abs(quality_df[col].mean()) < 0.0001, f"{col} mean should be close to 0"
+            assert abs(quality_df[col].std() - 1) < 0.0001, f"{col} std should be close to 1"
+            
+        # 3. Verify quality score calculation
+        calculated_score = quality_df[z_score_columns].mean(axis=1)
+        quality_score_diff = (quality_df['quality_score'] - calculated_score).abs()
+        assert (quality_score_diff < 0.0001).all(), "Quality score calculation mismatch"
+        
+        # 4. Test edge cases
+        # Verify no infinite values
+        assert not quality_df[required_columns].isin([np.inf, -np.inf]).any().any(), "Infinite values found"
+        
+        # Verify handling of extreme values
+        max_z_score = quality_df[z_score_columns].abs().max().max()
+        assert max_z_score < 10, f"Extreme z-scores detected: {max_z_score}"
+        
+        print("✓ calculate_quality_metrics test passed")
+        print(f"Processed {len(quality_df)} companies")
+        print(f"Z-score ranges:")
+        for col in z_score_columns:
+            print(f"{col}: [{quality_df[col].min():.2f}, {quality_df[col].max():.2f}]")
+        print(f"Quality score range: [{quality_df['quality_score'].min():.2f}, {quality_df['quality_score'].max():.2f}]")
+        
+    except Exception as e:
+        print(f"❌ Test failed: {str(e)}")
+        raise
