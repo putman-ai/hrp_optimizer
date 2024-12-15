@@ -1,9 +1,8 @@
-from src.data_handler import DataHandler
-
-from src.data_handler import DataHandler
 import pandas as pd
 import numpy as np
 import pytest
+
+from src.data_handler import DataHandler
 
 def test_load_market_data():
     """Test comprehensive data loading and validation from sp500_data.csv"""
