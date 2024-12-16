@@ -32,17 +32,14 @@ class PortfolioManager:
             'market_cap': top_n['market_cap']
         })
         
-        data = yf.download(
-            hrp_df['ticker'].tolist(),
-            start=start_date,
-            end=end_date
-        )['Adj Close']
-        
         portfolio_metrics = self.portfolio.optimize_portfolio(
-            data=data,
+            tickers=hrp_df['ticker'].tolist(),
             market_caps=hrp_df['market_cap'].values,
+            start_date=start_date,
+            end_date=end_date,
             num_clusters=num_clusters,
-            risk_measure=risk_measure
+            risk_measure=risk_measure,
+            max_weight = .05
         )
         
         results = pd.DataFrame({
@@ -57,6 +54,8 @@ class PortfolioManager:
             portfolio_metrics.linkage_matrix
         )
         plt.show()
+        
+        return results
 
 if __name__ == "__main__":
     manager = PortfolioManager(risk_free_rate=0.02)
