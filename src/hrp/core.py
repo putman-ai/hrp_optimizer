@@ -11,10 +11,26 @@ def create_hrp_portfolio(
     market_caps: np.ndarray,
     start_date: str,
     end_date: str,
-    num_clusters: int = 3
+    num_clusters: int = 3,
+    max_weight: float = 0.10  # Added max_weight parameter with 10% default
 ) -> Tuple[pd.Series, np.ndarray, pd.DataFrame]:
     """
-    Creates a Hierarchical Risk Parity portfolio with market cap weighting.
+    Creates a Hierarchical Risk Parity portfolio with market cap weighting and position limits.
+    
+    Parameters:
+    -----------
+    tickers : List[str]
+        List of ticker symbols
+    market_caps : np.ndarray
+        Array of market capitalizations
+    start_date : str
+        Start date for historical data
+    end_date : str
+        End date for historical data
+    num_clusters : int
+        Number of clusters for hierarchical clustering
+    max_weight : float
+        Maximum allowed weight for any single position (default 10%)
     """
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
@@ -69,8 +85,22 @@ def create_hrp_portfolio(
         weights = weights * available_market_caps
         weights = weights / weights.sum()
         
-        min_weight = 0.01
-        weights[weights < min_weight] = 0
+        # Apply maximum weight constraint
+        logger.info(f"Applying maximum weight constraint of {max_weight:.1%}...")
+        while weights.max() > max_weight:
+            # Cap weights at maximum
+            excess = weights[weights > max_weight] - max_weight
+            weights[weights > max_weight] = max_weight
+            
+            # Redistribute excess weight proportionally to remaining assets
+            remaining_assets = weights[weights < max_weight].index
+            if len(remaining_assets) > 0:
+                total_excess = excess.sum()
+                current_remaining_weights = weights[remaining_assets]
+                weights[remaining_assets] += (total_excess * 
+                    (current_remaining_weights / current_remaining_weights.sum()))
+        
+        # Ensure weights sum to 1 after all adjustments
         weights = weights / weights.sum()
         
         logger.info("Portfolio optimization complete")

@@ -1,6 +1,6 @@
 from src.proc.data_handler import DataHandler
-from src.hrp.hrp_core import create_hrp_portfolio
-from src.viz.visualization import plot_portfolio_analysis
+from src.hrp.core import create_hrp_portfolio
+from src.viz.plots import plot_portfolio_analysis
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
@@ -8,7 +8,7 @@ if __name__ == "__main__":
     
     df = handler.load_market_data('data/sp500_data.csv', 2000) # data source Finbox and/or EODHistorical
     df = handler.calculate_quality_metrics(df)
-    hrp_df = handler.prepare_hrp_data(df)
+    hrp_df = handler.prepare_hrp_data(df, 50)
     
     try:
         weights, linkage_matrix, returns = create_hrp_portfolio(
