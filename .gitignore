@@ -79,9 +79,20 @@ target/
 .ipynb_checkpoints
 
 # Project-specific directories
-data/
+# data/
 project_management/
 research_papers/
+tests/
+parked/
+
+# Project-specific files
+sp500_data.csv
+advanced_dev.py 
+core.py 
+ranking.py 
+data_analysis.ipynb 
+hrp_core.ipynb 
+hrp_ranking.ipynb 
 
 # IPython
 profile_default/
