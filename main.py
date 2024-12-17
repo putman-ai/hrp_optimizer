@@ -1,5 +1,5 @@
 from src.proc.data_handler import DataHandler
-from src.hrp.advanced_dev import HRPPortfolio
+from src.hrp.optimizer import HRPPortfolio
 from src.viz.plots import plot_portfolio_analysis
 import matplotlib.pyplot as plt
 import pandas as pd
