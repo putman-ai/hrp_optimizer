@@ -23,7 +23,7 @@ class HRPPortfolio:
         self,
         risk_free_rate: float = 0.02,
         min_weight: float = 0.01,
-        max_weight: float = 0.10
+        max_weight: float = 0.15
     ):
         self.risk_free_rate = risk_free_rate
         self.min_weight = min_weight
