@@ -87,7 +87,7 @@ parked/
 
 # Project-specific files
 sp500_data.csv
-advanced_dev.py 
+optimizer_dev.py 
 core.py 
 ranking.py 
 data_analysis.ipynb 
