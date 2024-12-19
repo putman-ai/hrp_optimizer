@@ -1,9 +1,17 @@
-from src.proc.data_handler import DataHandler
-from src.hrp.optimizer import HRPPortfolio
-from src.viz.plots import plot_portfolio_analysis
+# System imports
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+# Third-party imports
 import matplotlib.pyplot as plt
 import pandas as pd
 import yfinance as yf
+
+# Local imports
+from src.proc.data_handler import DataHandler
+from src.hrp.optimizer import HRPPortfolio
+from src.viz.plots import plot_portfolio_analysis
+
 
 class PortfolioManager:
     def __init__(self, risk_free_rate: float = 0.02):
