@@ -93,6 +93,7 @@ ranking.py
 data_analysis.ipynb 
 hrp_core.ipynb 
 hrp_ranking.ipynb 
+hrp_optimizer_dev.ipynb
 
 # IPython
 profile_default/
