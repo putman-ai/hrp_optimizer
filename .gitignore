@@ -87,13 +87,15 @@ parked/
 
 # Project-specific files
 sp500_data.csv
-optimizer_dev.py 
 core.py 
 ranking.py 
 data_analysis.ipynb 
-hrp_core.ipynb 
-hrp_ranking.ipynb 
+
 hrp_optimizer_dev.ipynb
+optimizer_dev.py 
+plot_metrics_dev.py
+plots_dev.py
+portfolio_dev.py
 
 # IPython
 profile_default/

@@ -12,20 +12,15 @@ class PortfolioMetrics:
     weights: pd.Series
     linkage_matrix: np.ndarray
     returns: pd.DataFrame
-    sharpe_ratio: float
-    volatility: float
-    expected_return: float
     clusters: np.ndarray
     max_weight: float
 
 class HRPPortfolio:
     def __init__(
         self,
-        risk_free_rate: float = 0.02,
         min_weight: float = 0.01,
         max_weight: float = 0.15
     ):
-        self.risk_free_rate = risk_free_rate
         self.min_weight = min_weight
         self.max_weight = max_weight
         logging.basicConfig(level=logging.INFO)
@@ -120,18 +115,6 @@ class HRPPortfolio:
         weights = weights / weights.sum()
         return weights
 
-    def _calculate_portfolio_metrics(self, returns: pd.DataFrame, weights: pd.Series) -> Dict[str, float]:
-        portfolio_returns = (returns * weights).sum(axis=1)
-        expected_return = portfolio_returns.mean() * 252
-        volatility = portfolio_returns.std() * np.sqrt(252)
-        sharpe_ratio = (expected_return - self.risk_free_rate) / volatility
-        
-        return {
-            'sharpe_ratio': sharpe_ratio,
-            'volatility': volatility,
-            'expected_return': expected_return
-        }
-
     def optimize_portfolio(
         self,
         tickers: List[str],
@@ -192,15 +175,10 @@ class HRPPortfolio:
             
             weights = weights / weights.sum()
             
-            metrics = self._calculate_portfolio_metrics(returns, weights)
-            
             return PortfolioMetrics(
                 weights=weights,
                 linkage_matrix=linkage_matrix,
                 returns=returns,
-                sharpe_ratio=metrics['sharpe_ratio'],
-                volatility=metrics['volatility'],
-                expected_return=metrics['expected_return'],
                 clusters=clusters,
                 max_weight=max_weight
             )
@@ -208,51 +186,6 @@ class HRPPortfolio:
         except Exception as e:
             self.logger.error(f"Error in portfolio optimization: {e}")
             raise
-
-    def _calculate_optimal_weights(
-        self,
-        returns: pd.DataFrame,
-        clusters: np.ndarray,
-        market_caps: pd.Series
-    ) -> pd.Series:
-        """Calculate optimal weights using HRP with market cap weighting within clusters."""
-        cluster_weights = self._get_cluster_weights(returns, clusters)
-        weights = pd.Series(0, index=returns.columns)
-        
-        for cluster in np.unique(clusters):
-            cluster_assets = clusters == cluster
-            cluster_market_caps = market_caps[returns.columns[cluster_assets]]
-            normalized_caps = cluster_market_caps / cluster_market_caps.sum()
-            weights[cluster_assets] = cluster_weights[cluster] * normalized_caps
-        
-        weights = self._apply_position_limits(weights)
-        return weights
-
-    def _get_cluster_weights(self, returns: pd.DataFrame, clusters: np.ndarray) -> Dict[int, float]:
-        cluster_variances = {}
-        for i in np.unique(clusters):
-            cluster_returns = returns.iloc[:, clusters == i].mean(axis=1)
-            cluster_variances[i] = np.var(cluster_returns) or 1e-8
-            
-        total_inv_variance = sum(1/v for v in cluster_variances.values())
-        return {i: (1/v)/total_inv_variance for i, v in cluster_variances.items()}
-
-    def _apply_position_limits(self, weights: pd.Series) -> pd.Series:
-        weights[weights < self.min_weight] = 0
-        weights = weights / weights.sum()
-        return weights
-
-    def _calculate_portfolio_metrics(self, returns: pd.DataFrame, weights: pd.Series) -> Dict[str, float]:
-        portfolio_returns = (returns * weights).sum(axis=1)
-        expected_return = portfolio_returns.mean() * 252
-        volatility = portfolio_returns.std() * np.sqrt(252)
-        sharpe_ratio = (expected_return - self.risk_free_rate) / volatility
-        
-        return {
-            'sharpe_ratio': sharpe_ratio,
-            'volatility': volatility,
-            'expected_return': expected_return
-        }
 
     @staticmethod
     def _setup_logger() -> logging.Logger:

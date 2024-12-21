@@ -4,6 +4,7 @@ from scipy import stats
 from typing import Dict, Tuple, Optional
 from dataclasses import dataclass
 
+
 @dataclass
 class PortfolioAnalytics:
     """Container for comprehensive portfolio analytics"""

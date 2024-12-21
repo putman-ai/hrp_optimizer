@@ -34,17 +34,5 @@ def plot_portfolio_analysis(returns, weights, linkage_matrix, figsize=(12, 12)):
     ax3.set_title('Portfolio Weights (Non-Zero Positions)')
     ax3.set_xlabel('Weight')
     
-    portfolio_return = (returns * weights).sum(axis=1)
-    annual_return = portfolio_return.mean() * 252
-    annual_vol = portfolio_return.std() * np.sqrt(252)
-    pseudo_sharpe = annual_return / annual_vol
-    
-    metrics_text = f'Annual Return: {annual_return:.2%}\n'
-    metrics_text += f'Annual Volatility: {annual_vol:.2%}\n'
-    metrics_text += f'Pseudo Sharpe: {pseudo_sharpe:.2f}'
-    
-    # Changed position to lower right (0.75, 0.02)
-    plt.figtext(0.75, 0.02, metrics_text, fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
-    
     plt.tight_layout()
     return fig
